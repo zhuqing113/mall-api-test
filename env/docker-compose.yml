@@ -1,0 +1,46 @@
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: mall-mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mall
+      TZ: Asia/Shanghai
+    ports:
+      - "3307:3306"
+    volumes:
+      - mall-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  redis:
+    image: redis:7.0
+    container_name: mall-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - mall-redis-data:/data
+  mall-admin:
+    build:
+      context: ../../mall-src
+      dockerfile: ../mall-api-test/env/mall-admin.Dockerfile
+    image: mall-admin:local
+    container_name: mall-admin
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/mall?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
+      SPRING_DATA_REDIS_HOST: redis
+    ports:
+      - "8080:8080"
+
+volumes:
+  mall-mysql-data:
+  mall-redis-data:
