@@ -5,15 +5,8 @@ import uuid
 BASE = "http://localhost:8080"
 
 
-def get_headers():
-    d = requests.post(f"{BASE}/admin/login",
-                      json={"username": "admin", "password": "macro123"},
-                      timeout=10).json()["data"]
-    return {"Authorization": d["tokenHead"] + d["token"]}
-
-
-def test_create_and_delete_brand():
-    h = get_headers()
+def test_create_and_delete_brand(auth_headers):
+    h = auth_headers
     name = f"AUTOTEST_{uuid.uuid4().hex}" 
     brand_id = None  # 先设为 None，创建失败时 finally 里就知道没有 id 可删
 
