@@ -1,8 +1,8 @@
 import time
 import requests
 import uuid
+from config import BASE_URL
 
-BASE = "http://localhost:8080"
 
 
 def test_create_and_delete_brand(auth_headers):
@@ -12,7 +12,7 @@ def test_create_and_delete_brand(auth_headers):
 
     try:
         # 1. 创建
-        r = requests.post(f"{BASE}/brand/create",
+        r = requests.post(f"{BASE_URL}/brand/create",
                           json={"name": name, "logo": "http://x/logo.png"},
                           headers=h, timeout=10)
         assert r.status_code == 200
@@ -20,18 +20,18 @@ def test_create_and_delete_brand(auth_headers):
        
 
         # 2. 按关键字查 id
-        r = requests.get(f"{BASE}/brand/list",
+        r = requests.get(f"{BASE_URL}/brand/list",
                          params={"keyword": name, "pageNum": 1, "pageSize": 20},
                          headers=h, timeout=10)
         data = r.json()["data"]
         assert data["total"] == 1
         brand_id = data["list"][0]["id"]
         assert data["list"][0]["name"] == name
-        r = requests.get(f"{BASE}/brand/delete/{brand_id}", headers=h, timeout=10)
+        r = requests.get(f"{BASE_URL}/brand/delete/{brand_id}", headers=h, timeout=10)
         # 填空5：断言删除的 HTTP 状态码和业务码都是 200
         assert r.status_code == 200
         assert r.json()["code"] == 200
-        r = requests.get(f"{BASE}/brand/list",
+        r = requests.get(f"{BASE_URL}/brand/list",
                          params={"keyword": name, "pageNum": 1, "pageSize": 20},
                          headers=h, timeout=10)
         assert r.json()["data"]["total"] == 0
@@ -41,6 +41,6 @@ def test_create_and_delete_brand(auth_headers):
         # 3. 清理：只有拿到 id 才删
         if brand_id is not None:
             try:
-                requests.get(f"{BASE}/brand/delete/{brand_id}", headers=h, timeout=10)
+                requests.get(f"{BASE_URL}/brand/delete/{brand_id}", headers=h, timeout=10)
             except Exception as e:
                 print(f"清理测试数据失败，brand_id: {brand_id}, 错误: {e}")
