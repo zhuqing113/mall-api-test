@@ -5,35 +5,34 @@ from config import BASE_URL
 
 
 
-def test_create_and_delete_brand(auth_headers):
-    h = auth_headers
+def test_create_and_delete_brand(client):
     name = f"AUTOTEST_{uuid.uuid4().hex}" 
     brand_id = None  # 先设为 None，创建失败时 finally 里就知道没有 id 可删
 
     try:
         # 1. 创建
-        r = requests.post(f"{BASE_URL}/brand/create",
-                          json={"name": name, "logo": "http://x/logo.png"},
-                          headers=h, timeout=10)
+        r = client.post(f"/brand/create",
+                          json={"name": name, "logo": "http://x/logo.png"}
+                          )
         assert r.status_code == 200
         assert r.json()["code"] == 200
        
 
         # 2. 按关键字查 id
-        r = requests.get(f"{BASE_URL}/brand/list",
-                         params={"keyword": name, "pageNum": 1, "pageSize": 20},
-                         headers=h, timeout=10)
+        r = client.get(f"/brand/list",
+                         params={"keyword": name, "pageNum": 1, "pageSize": 20}
+                         )
         data = r.json()["data"]
         assert data["total"] == 1
         brand_id = data["list"][0]["id"]
         assert data["list"][0]["name"] == name
-        r = requests.get(f"{BASE_URL}/brand/delete/{brand_id}", headers=h, timeout=10)
+        r = client.get(f"/brand/delete/{brand_id}")
         # 填空5：断言删除的 HTTP 状态码和业务码都是 200
         assert r.status_code == 200
         assert r.json()["code"] == 200
-        r = requests.get(f"{BASE_URL}/brand/list",
+        r = client.get(f"/brand/list",
                          params={"keyword": name, "pageNum": 1, "pageSize": 20},
-                         headers=h, timeout=10)
+                         )
         assert r.json()["data"]["total"] == 0
         brand_id = None
 
@@ -41,6 +40,6 @@ def test_create_and_delete_brand(auth_headers):
         # 3. 清理：只有拿到 id 才删
         if brand_id is not None:
             try:
-                requests.get(f"{BASE_URL}/brand/delete/{brand_id}", headers=h, timeout=10)
+                client.get(f"/brand/delete/{brand_id}")
             except Exception as e:
                 print(f"清理测试数据失败，brand_id: {brand_id}, 错误: {e}")

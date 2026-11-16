@@ -1,9 +1,5 @@
-import requests
-from config import BASE_URL                
-
-
-def test_get_brand_by_id(brand, auth_headers):
-    r = requests.get(f"{BASE_URL}/brand/{brand['id']}", headers=auth_headers, timeout=10)
+def test_get_brand_by_id(brand, client):
+    r = client.get(f"/brand/{brand['id']}")
     assert r.status_code == 200
     body = r.json()
     assert body["code"] == 200
