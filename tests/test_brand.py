@@ -11,7 +11,7 @@ def test_create_and_delete_brand(client):
 
     try:
         # 1. 创建
-        r = client.post(f"/brand/create",
+        r = client.post("/brand/create",
                           json={"name": name, "logo": "http://x/logo.png"}
                           )
         assert r.status_code == 200
@@ -19,7 +19,7 @@ def test_create_and_delete_brand(client):
        
 
         # 2. 按关键字查 id
-        r = client.get(f"/brand/list",
+        r = client.get("/brand/list",
                          params={"keyword": name, "pageNum": 1, "pageSize": 20}
                          )
         data = r.json()["data"]
@@ -27,10 +27,9 @@ def test_create_and_delete_brand(client):
         brand_id = data["list"][0]["id"]
         assert data["list"][0]["name"] == name
         r = client.get(f"/brand/delete/{brand_id}")
-        # 填空5：断言删除的 HTTP 状态码和业务码都是 200
         assert r.status_code == 200
         assert r.json()["code"] == 200
-        r = client.get(f"/brand/list",
+        r = client.get("/brand/list",
                          params={"keyword": name, "pageNum": 1, "pageSize": 20},
                          )
         assert r.json()["data"]["total"] == 0
