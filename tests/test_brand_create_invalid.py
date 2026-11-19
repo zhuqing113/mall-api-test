@@ -7,7 +7,7 @@ CASES = [
     ({"name": "", "logo": LOGO}, 404),                                  # name 空串
     ({"name": "AUTOTEST_p1"}, 404),                                    # 填空1：logo 缺失，预期码？依据？
     ({"name": "AUTOTEST_p2", "logo": LOGO, "sort": -1}, 404),          # 填空2：sort=-1
-    ({"name": "AUTOTEST_p3", "logo": LOGO, "showStatus": 2}, 404),   # 填空3：哪个值非法？
+    ({"name": "AUTOTEST_p3", "logo": LOGO, "showStatus": 2}, 404),  
 ]
 
 IDS = ["name missing", "name empty", "logo missing", "sort=-1", "showStatus=2"]
