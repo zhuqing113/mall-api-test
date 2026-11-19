@@ -40,11 +40,12 @@ def client(auth_headers):
 def db_guard():
     conn = pymysql.connect(host=DB_HOST, port=DB_PORT,
                            user=DB_USER, password=DB_PASS,
-                           database=DB_NAME)
+                           database=DB_NAME,
+                           autocommit=True)
     cur = conn.cursor()
     cur.execute("SELECT COALESCE(MAX(id), 0) FROM pms_brand")
     max_before = cur.fetchone()[0]
-    yield
+    yield cur, max_before
     cur.execute("DELETE FROM pms_brand WHERE id > %s", (max_before,))
     conn.commit()
     conn.close()
