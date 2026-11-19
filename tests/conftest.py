@@ -4,6 +4,8 @@ import uuid
 
 from config import BASE_URL, ADMIN_USER, ADMIN_PASS
 from client import ApiClient
+import pymysql
+from config import DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME
 
 
 @pytest.fixture(scope="session")
@@ -34,3 +36,15 @@ def brand(client):
 @pytest.fixture(scope="session")
 def client(auth_headers):
     return ApiClient(headers=auth_headers)   
+@pytest.fixture
+def db_guard():
+    conn = pymysql.connect(host=DB_HOST, port=DB_PORT,
+                           user=DB_USER, password=DB_PASS,
+                           database=DB_NAME)
+    cur = conn.cursor()
+    cur.execute("SELECT COALESCE(MAX(id), 0) FROM pms_brand")
+    max_before = cur.fetchone()[0]
+    yield
+    cur.execute("DELETE FROM pms_brand WHERE id > %s", (max_before,))
+    conn.commit()
+    conn.close()
