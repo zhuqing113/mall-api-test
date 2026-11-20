@@ -9,3 +9,4 @@ DB_PORT = int(os.environ.get("MALL_DB_PORT", "3307"))   # 填②:宿主机端口
 DB_USER = os.environ.get("MALL_DB_USER", "root")
 DB_PASS = os.environ.get("MALL_DB_PASS", "root")        # 填③:来自 docker-compose
 DB_NAME = os.environ.get("MALL_DB_NAME", "mall")
+TIMEOUT = float(os.environ.get("MALL_TIMEOUT", "10"))

@@ -2,7 +2,7 @@ import pytest
 import requests
 import uuid
 
-from config import BASE_URL, ADMIN_USER, ADMIN_PASS
+from config import BASE_URL, ADMIN_USER, ADMIN_PASS,TIMEOUT
 from client import ApiClient
 import pymysql
 from config import DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME
@@ -12,7 +12,7 @@ from config import DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME
 def auth_headers():
     d = requests.post(f"{BASE_URL}/admin/login",
                       json={"username": ADMIN_USER, "password": ADMIN_PASS},
-                      timeout=10).json()["data"]
+                      timeout=TIMEOUT).json()["data"]
     return {"Authorization": d["tokenHead"] + d["token"]}
 @pytest.fixture
 def brand(client):

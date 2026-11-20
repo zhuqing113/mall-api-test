@@ -1,9 +1,11 @@
 import requests
 from config import BASE_URL
+from config import TIMEOUT 
+
 
 
 class ApiClient:
-    def __init__(self, headers=None, timeout=10):
+    def __init__(self, headers=None, timeout=TIMEOUT):
         self.base_url = BASE_URL
         self.headers = headers
         self.timeout = timeout
