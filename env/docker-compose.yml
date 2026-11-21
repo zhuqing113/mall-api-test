@@ -40,7 +40,43 @@ services:
       SPRING_DATA_REDIS_HOST: redis
     ports:
       - "8080:8080"
+  mongo:
+    image: mongo:7.0
+    container_name: mall-mongo
+    volumes:
+      - mall-mongo-data:/data/db
+  rabbit:
+    image: rabbitmq:3
+    container_name: mall-rabbit
+    hostname: mall-rabbit
+    environment:
+      RABBITMQ_DEFAULT_USER: mall
+      RABBITMQ_DEFAULT_PASS: mall
+      RABBITMQ_DEFAULT_VHOST: /mall
+  mall-portal:
+    build:
+      context: ../../mall-src
+      dockerfile: ../mall-api-test/env/mall-portal.Dockerfile
+    image: mall-portal:local
+    container_name: mall-portal
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      mongo:
+        condition: service_started
+      rabbit:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/mall?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_MONGODB_HOST: mongo
+      SPRING_RABBITMQ_HOST: rabbit
+    ports:
+      - "8085:8085"
 
 volumes:
   mall-mysql-data:
   mall-redis-data:
+  mall-mongo-data:
