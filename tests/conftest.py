@@ -15,7 +15,7 @@ def auth_headers():
                       timeout=TIMEOUT).json()["data"]
     return {"Authorization": d["tokenHead"] + d["token"]}
 @pytest.fixture
-def brand(client):
+def brand(client,db_guard):
     name = f"AUTOTEST_{uuid.uuid4().hex[:8]}"
 
     # 准备：创建
