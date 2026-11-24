@@ -6,7 +6,7 @@ from config import BASE_URL, ADMIN_USER, ADMIN_PASS,TIMEOUT
 from client import ApiClient
 import pymysql
 from config import DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME
-
+from config import PORTAL_URL,MEMBER_USER,MEMBER_PASS
 
 @pytest.fixture(scope="session")
 def auth_headers():
@@ -49,3 +49,18 @@ def db_guard():
     cur.execute("DELETE FROM pms_brand WHERE id > %s", (max_before,))
     conn.commit()
     conn.close()
+@pytest.fixture(scope="session")
+def portal_client():
+    login = ApiClient(base_url=PORTAL_URL)
+    r = login.post("/sso/login", params={"username": MEMBER_USER, "password": MEMBER_PASS})
+    d = r.json()["data"]
+    headers = {"Authorization": d["tokenHead"] + d["token"]}
+    return ApiClient(headers=headers, base_url=PORTAL_URL)
+@pytest.fixture
+def cart_clean(db_guard):
+    cur, _ = db_guard
+    sql = "DELETE FROM oms_cart_item WHERE member_id = %s AND product_id = %s AND delete_status = 0"
+    cur.execute(sql, (1, 1))
+    yield
+    sql = "DELETE FROM oms_cart_item WHERE member_id = %s AND product_id = %s AND delete_status = 0"
+    cur.execute(sql, (1, 1))

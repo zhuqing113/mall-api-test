@@ -5,8 +5,8 @@ from config import TIMEOUT
 
 
 class ApiClient:
-    def __init__(self, headers=None, timeout=TIMEOUT):
-        self.base_url = BASE_URL
+    def __init__(self, headers=None, timeout=TIMEOUT,base_url=BASE_URL):
+        self.base_url = base_url
         self.headers = headers
         self.timeout = timeout
 
